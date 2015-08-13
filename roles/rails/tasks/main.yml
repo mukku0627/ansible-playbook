@@ -1,0 +1,32 @@
+---
+- name: install others package
+  yum: name={{ item }} state=present
+  with_items:
+    - libxml2
+    - libxslt
+    - libxml2-devel
+    - libxslt-devel
+    - gcc-c++
+
+- name: check .gemrc
+  shell: cat ~/.gemrc
+  register: check_gemrc
+  changed_when: false
+  always_run: yes
+
+- name: gemrc mod
+  shell: echo "install{{ colon }} --no-ri --no-rdoc" >> ~/.gemrc
+  when: check_gemrc.stdout.find("install") < 1
+
+- name: gemrc mod
+  shell: echo "update{{ colon }} --no-ri --no-rdoc" >> ~/.gemrc
+  when: check_gemrc.stdout.find("update") < 1
+
+- name: bundle install
+  shell: cd; bash -lc 'gem install bundle bundler'
+
+- name: nokogiri install
+  shell: cd; bash -lc 'gem install nokogiri -- --use-system-libraries'
+
+- name: rails install
+  shell: cd; bash -lc 'gem install rails --version="~> 4.2"'

@@ -1,0 +1,31 @@
+---
+- name: mysql repository install
+  yum: name=http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm state=present
+
+- name: mysql install
+  yum: name={{ item }} enablerepo=mysql56-community state=present
+  with_items:
+    - mysql-community-server
+    - mysql-community-devel
+    - mysql-utilities
+
+- name: file create
+  file: >
+    path=/var/log/mysql
+    owner=root
+    group=root
+    mode=0775
+    state=directory
+
+- name: my.cnf
+  template: >
+    src=my.cnf.j2
+    dest=/etc/my.cnf
+    owner=root
+    group=root
+    mode=0644
+  notify:
+    - reload mysqld
+
+- name: start mysqld service
+  service: name=mysqld state=started enabled=yes

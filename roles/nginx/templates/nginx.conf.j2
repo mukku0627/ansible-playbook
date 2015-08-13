@@ -1,0 +1,74 @@
+user  nginx rbenv;
+worker_processes  1;
+error_log  /var/log/nginx/error.log;
+pid        /var/run/nginx.pid;
+events {
+    worker_connections  10;
+}
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for" $request_length $request_time';
+
+    log_format ltsv 'time:$time_iso8601\t'
+                    'remote_addr:$remote_addr\t'
+                    'request_method:$request_method\t'
+                    'request_length:$request_length\t'
+                    'request_uri:$request_uri\t'
+                    'https:$https\t'
+                    'uri:$uri\t'
+                    'query_string:$query_string\t'
+                    'status:$status\t'
+                    'bytes_sent:$bytes_sent\t'
+                    'body_bytes_sent:$body_bytes_sent\t'
+                    'referer:$http_referer\t'
+                    'useragent:$http_user_agent\t'
+                    'forwardedfor:$http_x_forwarded_for\t'
+                    'request_time:$request_time\t'
+                    'request_length:$request_length\t'
+                    'upstream_response_time:$upstream_response_time';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    client_max_body_size 20M;
+
+    sendfile       on;
+    tcp_nopush     on;
+    keepalive_timeout  0;
+    server_tokens off;
+    gzip  on;
+
+    include /etc/nginx/conf.d/*.conf;
+    index   index.html index.htm;
+
+    server {
+        listen               80;
+        server_name          10.0.*;
+        root "/var/www";
+
+        location /favicon {
+            empty_gif;
+            access_log    off;
+            log_not_found off;
+        }
+    }
+
+    server {
+        listen               80;
+        server_name          127.0.0.1;
+        root "/var/www";
+
+        location /favicon {
+            empty_gif;
+            access_log    off;
+            log_not_found off;
+        }
+
+        location /health.html {
+            access_log    off;
+            log_not_found off;
+        }
+    }
+}

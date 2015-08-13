@@ -1,0 +1,16 @@
+---
+-   hosts: localhost
+    roles:
+      #- ruby
+      #- rails
+      - nginx
+      #- mysql
+    sudo: true
+    vars:
+      colon: ":"
+      project_name: doheal
+      project_domain: doheal.do.aih0.info
+      ruby_version: 2.2.2
+      rbenv_root: /usr/local/rbenv
+      rbenv_user: rbenv
+      rails_path: /var/www/doheal.do.aih0.info/doheal

@@ -1,0 +1,2 @@
+- name: reload mysqld
+  service: name=mysqld state=reloaded
